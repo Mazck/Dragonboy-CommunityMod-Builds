@@ -52,6 +52,9 @@ on:
         type: string
         required: false
         default: ""
+env:
+  SOURCE_REPOSITORY: ${{ secrets.SOURCE_CODE_REPOSITORY != '' && secrets.SOURCE_CODE_REPOSITORY || github.repository }}
+  SOURCE_BRANCH: ${{ secrets.SOURCE_CODE_BRANCH != '' && secrets.SOURCE_CODE_BRANCH || github.ref_name }}
 jobs:
   check-new-commit:
     name: Kiểm tra commit mới
@@ -70,7 +73,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Lấy hash commit mới nhất
         run: |
-          $commit = git ls-remote https://github.com/${{ secrets.SOURCE_CODE_REPOSITORY }}.git ${{ secrets.SOURCE_CODE_BRANCH }}
+          $commit = git ls-remote https://github.com/${{ env.SOURCE_REPOSITORY }}.git ${{ env.SOURCE_BRANCH }}
           $hash = $commit.Split("`t")[0]
           echo "LATEST_COMMIT=$hash" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Cache hash commit
@@ -109,8 +112,8 @@ jobs:
     - name: Clone
       uses: actions/checkout@v4
       with:
-        repository: ${{ secrets.SOURCE_CODE_REPOSITORY }}
-        ref: ${{ secrets.SOURCE_CODE_BRANCH }}
+        repository: ${{ env.SOURCE_REPOSITORY }}
+        ref: ${{ env.SOURCE_BRANCH }}
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
     - name: Setup NuGet
@@ -147,8 +150,8 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
         with:
-          repository: ${{ secrets.SOURCE_CODE_REPOSITORY }}
-          ref: ${{ secrets.SOURCE_CODE_BRANCH }}
+          repository: ${{ env.SOURCE_REPOSITORY }}
+          ref: ${{ env.SOURCE_BRANCH }}
       - name: Cache
         id: cache-restore
         uses: actions/cache@v4
@@ -237,8 +240,8 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
         with:
-          repository: ${{ secrets.SOURCE_CODE_REPOSITORY }}
-          ref: ${{ secrets.SOURCE_CODE_BRANCH }}
+          repository: ${{ env.SOURCE_REPOSITORY }}
+          ref: ${{ env.SOURCE_BRANCH }}
       - name: Cache
         uses: actions/cache@v4
         id: cache-restore
@@ -305,8 +308,8 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
         with:
-          repository: ${{ secrets.SOURCE_CODE_REPOSITORY }}
-          ref: ${{ secrets.SOURCE_CODE_BRANCH }}
+          repository: ${{ env.SOURCE_REPOSITORY }}
+          ref: ${{ env.SOURCE_BRANCH }}
       - name: Giải phóng bộ nhớ 
         uses: jlumbroso/free-disk-space@v1.3.1
       - name: Cache
